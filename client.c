@@ -210,9 +210,8 @@ int main (int argc, char *argv[])
     //       single data packet, and then tears down the connection without
     //       handling data loss.
     //       Only for demo purpose. DO NOT USE IT in your final submission
-    int recv = 1;
     while (1) {
-        while (e < WND_SIZE && !feof(fp) && recv) {
+        while (e < WND_SIZE && !feof(fp)) {
             seqNum += m;
             m = fread(buf, 1, PAYLOAD_SIZE, fp);
             buildPkt(&pkts[e], seqNum % MAX_SEQN, 0, 0, 0, 0, 0, m, buf);
@@ -220,16 +219,14 @@ int main (int argc, char *argv[])
             sendto(sockfd, &pkts[e], PKT_SIZE, 0, (struct sockaddr*) &servaddr, servaddrlen);
             e += 1;
         }
-        e = 0;
-        recv = 0;
 
         n = recvfrom(sockfd, &ackpkt, PKT_SIZE, 0, (struct sockaddr *) &servaddr, (socklen_t *) &servaddrlen);
         if (n > 0) {
-            recv = 1;
+            e -= 1;
             printRecv(&ackpkt);
-            if (feof(fp)) {
-                break;
-            }
+        }
+        if (feof(fp)) {
+            break;
         }
     }
 
