@@ -12,7 +12,7 @@
 
 // =====================================
 
-#define RTO 500000 /* timeout in microseconds */
+#define RTO 500000 /* timeout in micrseqNuoseconds */
 #define HDR_SIZE 12 /* header size*/
 #define PKT_SIZE 524 /* total packet size */
 #define PAYLOAD_SIZE 512 /* PKT_SIZE - HDR_SIZE */
@@ -210,10 +210,26 @@ int main (int argc, char *argv[])
     //       single data packet, and then tears down the connection without
     //       handling data loss.
     //       Only for demo purpose. DO NOT USE IT in your final submission
+    int recv = 1;
     while (1) {
+        while (e < WND_SIZE && !feof(fp) && recv) {
+            seqNum += m;
+            m = fread(buf, 1, PAYLOAD_SIZE, fp);
+            buildPkt(&pkts[e], seqNum % MAX_SEQN, 0, 0, 0, 0, 0, m, buf);
+            printSend(&pkts[e], 0);
+            sendto(sockfd, &pkts[e], PKT_SIZE, 0, (struct sockaddr*) &servaddr, servaddrlen);
+            e += 1;
+        }
+        e = 0;
+        recv = 0;
+
         n = recvfrom(sockfd, &ackpkt, PKT_SIZE, 0, (struct sockaddr *) &servaddr, (socklen_t *) &servaddrlen);
         if (n > 0) {
-            break;
+            recv = 1;
+            printRecv(&ackpkt);
+            if (feof(fp)) {
+                break;
+            }
         }
     }
 

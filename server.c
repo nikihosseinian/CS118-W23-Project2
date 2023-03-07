@@ -202,6 +202,8 @@ int main (int argc, char *argv[])
             n = recvfrom(sockfd, &recvpkt, PKT_SIZE, 0, (struct sockaddr *) &cliaddr, (socklen_t *) &cliaddrlen);
             if (n > 0) {
                 printRecv(&recvpkt);
+                buildPkt(&ackpkt, seqNum, recvpkt.seqnum + PAYLOAD_SIZE, 0, 0, 1, 0, 0, NULL);
+                printSend(&ackpkt, 0);
 
                 if (recvpkt.fin) {
                     cliSeqNum = (cliSeqNum + 1) % MAX_SEQN;
