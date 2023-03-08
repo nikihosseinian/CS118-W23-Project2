@@ -224,9 +224,9 @@ int main (int argc, char *argv[])
         if (n > 0) {
             e -= 1;
             printRecv(&ackpkt);
-        }
-        if (feof(fp)) {
-            break;
+            if (feof(fp)) {
+                break;
+            }
         }
     }
 
