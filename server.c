@@ -202,18 +202,15 @@ int main (int argc, char *argv[])
             n = recvfrom(sockfd, &recvpkt, PKT_SIZE, 0, (struct sockaddr *) &cliaddr, (socklen_t *) &cliaddrlen);
             if (n > 0) {
                 printRecv(&recvpkt);
-
                 if (recvpkt.fin) {
-                    cliSeqNum = (cliSeqNum + 1) % MAX_SEQN;
-
+                    cliSeqNum = (recvpkt.seqnum + 1) % MAX_SEQN;
                     buildPkt(&ackpkt, seqNum, cliSeqNum, 0, 0, 1, 0, 0, NULL);
                     printSend(&ackpkt, 0);
                     sendto(sockfd, &ackpkt, PKT_SIZE, 0, (struct sockaddr*) &cliaddr, cliaddrlen);
-
                     break;
                 }
                 else {
-                    buildPkt(&ackpkt, seqNum, recvpkt.seqnum + PAYLOAD_SIZE, 0, 0, 1, 0, 0, NULL);
+                    buildPkt(&ackpkt, seqNum, (recvpkt.seqnum + recvpkt.length) % MAX_SEQN, 0, 0, 1, 0, 0, NULL);
                     printSend(&ackpkt, 0);
                     sendto(sockfd, &ackpkt, PKT_SIZE, 0, (struct sockaddr*) &cliaddr, cliaddrlen);
                 }

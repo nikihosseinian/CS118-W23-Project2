@@ -185,9 +185,9 @@ int main (int argc, char *argv[])
 
     struct packet ackpkt;
     struct packet pkts[WND_SIZE];
-    int s = 0;
+    // int s = 0;
     int e = 0;
-    int full = 0;
+    // int full = 0;
 
     // =====================================
     // Send First Packet (ACK containing payload)
@@ -212,9 +212,9 @@ int main (int argc, char *argv[])
     //       Only for demo purpose. DO NOT USE IT in your final submission
     while (1) {
         while (e < WND_SIZE && !feof(fp)) {
-            seqNum += m;
+            seqNum = (seqNum + m) % MAX_SEQN;
             m = fread(buf, 1, PAYLOAD_SIZE, fp);
-            buildPkt(&pkts[e], seqNum % MAX_SEQN, 0, 0, 0, 0, 0, m, buf);
+            buildPkt(&pkts[e], seqNum, 0, 0, 0, 0, 0, m, buf);
             printSend(&pkts[e], 0);
             sendto(sockfd, &pkts[e], PKT_SIZE, 0, (struct sockaddr*) &servaddr, servaddrlen);
             e += 1;
@@ -228,6 +228,9 @@ int main (int argc, char *argv[])
                 break;
             }
         }
+    }
+    while (recvfrom(sockfd, &ackpkt, PKT_SIZE, 0, (struct sockaddr *) &servaddr, (socklen_t *) &servaddrlen) > 0) {
+        printRecv(&ackpkt);
     }
 
     // *** End of your client implementation ***
