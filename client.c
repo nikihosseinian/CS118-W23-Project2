@@ -183,11 +183,13 @@ int main (int argc, char *argv[])
     // =====================================
     // CIRCULAR BUFFER VARIABLES
 
-    struct packet ackpkt;
+    struct packet ackpkt, unackpkt;
     struct packet pkts[WND_SIZE];
-    int s = 0;
+    // int s = 0;
     int e = 0;
     // int full = 0;
+    int num_pkts = 0;
+    int num_acks = 0;
 
     // =====================================
     // Send First Packet (ACK containing payload)
@@ -198,9 +200,11 @@ int main (int argc, char *argv[])
     printSend(&pkts[0], 0);
     sendto(sockfd, &pkts[0], PKT_SIZE, 0, (struct sockaddr*) &servaddr, servaddrlen);
     timer = setTimer();
+    unackpkt = pkts[0];
     buildPkt(&pkts[0], seqNum, (synackpkt.seqnum + 1) % MAX_SEQN, 0, 0, 0, 1, m, buf);
 
     e = 1;
+    num_pkts = 1;
 
     // =====================================
     // *** TODO: Implement the rest of reliable transfer in the client ***
@@ -219,6 +223,7 @@ int main (int argc, char *argv[])
                 printSend(&pkts[e], 0);
                 sendto(sockfd, &pkts[e], PKT_SIZE, 0, (struct sockaddr*) &servaddr, servaddrlen);
                 e += 1;
+                num_pkts += 1;
             }
             else {
                 break;
@@ -227,17 +232,26 @@ int main (int argc, char *argv[])
         n = recvfrom(sockfd, &ackpkt, PKT_SIZE, 0, (struct sockaddr *) &servaddr, (socklen_t *) &servaddrlen);
         if (n > 0) {
             e -= 1;
+            num_acks += 1;
             printRecv(&ackpkt);
-            if (m <= 0) {
+            if (ackpkt.ack) {
+                for (int i = 0; i < WND_SIZE - 1; i++) {
+                    pkts[i] = pkts[i + 1];
+                    unackpkt = pkts[0];
+                    timer = setTimer();
+                }
+            }
+            if (m <= 0 && num_pkts == num_acks) {
                 break;
             }
         }
-    }
-    while (1) {
-        n = recvfrom(sockfd, &ackpkt, PKT_SIZE, 0, (struct sockaddr *) &servaddr, (socklen_t *) &servaddrlen);
-        if (n > 0) {
-            printRecv(&ackpkt);
-            break;
+        else if (isTimeout(timer)) {
+            printTimeout(&unackpkt);
+            for (int i = 0; i < WND_SIZE; i++) {
+                printSend(&pkts[i], 1);
+                sendto(sockfd, &pkts[i], PKT_SIZE, 0, (struct sockaddr*) &servaddr, servaddrlen);
+            }
+            timer = setTimer();
         }
     }
 
