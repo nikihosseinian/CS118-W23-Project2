@@ -152,13 +152,14 @@ int main (int argc, char *argv[])
     sendto(sockfd, &synpkt, PKT_SIZE, 0, (struct sockaddr*) &servaddr, servaddrlen);
     double timer = setTimer();
     int n;
+    int recv_ack = -1;
 
     while (1) {
         while (1) {
             n = recvfrom(sockfd, &synackpkt, PKT_SIZE, 0, (struct sockaddr *) &servaddr, (socklen_t *) &servaddrlen);
-
-            if (n > 0)
+            if (n > 0) {
                 break;
+            }
             else if (isTimeout(timer)) {
                 printTimeout(&synpkt);
                 printSend(&synpkt, 1);
@@ -167,6 +168,7 @@ int main (int argc, char *argv[])
             }
         }
 
+        recv_ack = synackpkt.acknum;
         printRecv(&synackpkt);
         if ((synackpkt.ack || synackpkt.dupack) && synackpkt.syn && synackpkt.acknum == (seqNum + 1) % MAX_SEQN) {
             seqNum = synackpkt.acknum;
@@ -185,8 +187,9 @@ int main (int argc, char *argv[])
 
     struct packet ackpkt, unackpkt;
     struct packet pkts[WND_SIZE];
-    // int s = 0;
+    int s = 0;
     int e = 0;
+    double d = 0;
     // int full = 0;
     int num_pkts = 0;
     int num_acks = 0;
@@ -231,23 +234,35 @@ int main (int argc, char *argv[])
         }
         n = recvfrom(sockfd, &ackpkt, PKT_SIZE, 0, (struct sockaddr *) &servaddr, (socklen_t *) &servaddrlen);
         if (n > 0) {
-            e -= 1;
-            num_acks += 1;
+            d = (ackpkt.acknum - recv_ack) / 512.0;
+            if (d == 0) {
+                s = 0;
+            }
+            else if (d < 1) {
+                s = 1;
+            }
+            else {
+                s = d;
+            }
+            e -= s;
+            num_acks += s;
+            recv_ack = ackpkt.acknum;
             printRecv(&ackpkt);
+
             if (ackpkt.ack) {
                 for (int i = 0; i < WND_SIZE - 1; i++) {
-                    pkts[i] = pkts[i + 1];
-                    unackpkt = pkts[0];
-                    timer = setTimer();
+                    pkts[i] = pkts[i + s];
                 }
+                unackpkt = pkts[0];
+                timer = setTimer();
             }
             if (m <= 0 && num_pkts == num_acks) {
                 break;
             }
         }
-        else if (isTimeout(timer)) {
+        if (isTimeout(timer)) {
             printTimeout(&unackpkt);
-            for (int i = 0; i < WND_SIZE; i++) {
+            for (int i = 0; i < e; i++) {
                 printSend(&pkts[i], 1);
                 sendto(sockfd, &pkts[i], PKT_SIZE, 0, (struct sockaddr*) &servaddr, servaddrlen);
             }
@@ -277,7 +292,6 @@ int main (int argc, char *argv[])
     while (1) {
         while (1) {
             n = recvfrom(sockfd, &recvpkt, PKT_SIZE, 0, (struct sockaddr *) &servaddr, (socklen_t *) &servaddrlen);
-
             if (n > 0)
                 break;
             if (timerOn && isTimeout(timer)) {
