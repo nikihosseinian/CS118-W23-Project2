@@ -172,6 +172,7 @@ int main (int argc, char *argv[])
         printRecv(&synackpkt);
         if ((synackpkt.ack || synackpkt.dupack) && synackpkt.syn && synackpkt.acknum == (seqNum + 1) % MAX_SEQN) {
             seqNum = synackpkt.acknum;
+            timer = setTimer();
             break;
         }
     }
@@ -234,17 +235,17 @@ int main (int argc, char *argv[])
         }
         n = recvfrom(sockfd, &ackpkt, PKT_SIZE, 0, (struct sockaddr *) &servaddr, (socklen_t *) &servaddrlen);
         if (n > 0) {
+            printRecv(&ackpkt);
             d = (ackpkt.acknum - recv_ack) / 512.0;
-            if (d == 0) {
-                s = 0;
+            if (d < 0) {
+                s = (MAX_SEQN - recv_ack + ackpkt.acknum) / 512.0;
             }
-            else if (d < 1) {
+            else if ( d < 1) {
                 s = 1;
             }
             else {
                 s = d;
             }
-            printRecv(&ackpkt);
             if (d != 0) {
                 e -= s;
                 num_acks += s;
