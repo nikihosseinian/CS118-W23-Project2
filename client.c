@@ -244,13 +244,12 @@ int main (int argc, char *argv[])
             else {
                 s = d;
             }
-            e -= s;
-            num_acks += s;
-            recv_ack = ackpkt.acknum;
             printRecv(&ackpkt);
-
-            if (ackpkt.ack) {
-                for (int i = 0; i < WND_SIZE - 1; i++) {
+            if (d != 0) {
+                e -= s;
+                num_acks += s;
+                recv_ack = ackpkt.acknum;
+                for (int i = 0; i < WND_SIZE - s; i++) {
                     pkts[i] = pkts[i + s];
                 }
                 unackpkt = pkts[0];
