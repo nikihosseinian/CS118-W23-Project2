@@ -211,7 +211,11 @@ int main (int argc, char *argv[])
                     break;
                 }
                 if (recvpkt.seqnum == latest_ack) {
+                    // writing the data to the file 
+                    fwrite(recvpkt.payload, 1, recvpkt.length, fp);
+                    // the next seqNUme 
                     latest_ack = (recvpkt.seqnum + recvpkt.length) % MAX_SEQN;
+                   
                     buildPkt(&ackpkt, seqNum, (recvpkt.seqnum + recvpkt.length) % MAX_SEQN, 0, 0, 1, 0, 0, NULL);
                     printSend(&ackpkt, 0);
                     sendto(sockfd, &ackpkt, PKT_SIZE, 0, (struct sockaddr*) &cliaddr, cliaddrlen);
