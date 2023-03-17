@@ -9,17 +9,17 @@ This project aims to create a custom reliable data transfer protocol similar to 
 2. Change Directory: `cd CS118-W23-Project2`
 3. Open 1st Terminal: 
 <br /> Compile: `gcc server.c -o server`
-    Run: `./server <port> <ISN>`
-        <port> port number 
-        <isn>  initial sequence number 
+<br /> Run: `./server <port> <ISN>`
+<br /> <port> port number 
+<br />  <isn>  initial sequence number 
           
 4. Open 2nd Terminal 
-    Compile: `gcc client.c -o client`
-    Run: `./client <HOSTNAME-OR-IP> <PORT> <ISN> <FILENAME>`
-        <HOSTNAME-OR-IP> hostname or IP address of the server to connect 
-        <port>           port number 
-        <isn>            initial sequence number 
-        <FILENAME>       name of file to transfer 
+    <br /> Compile: `gcc client.c -o client`
+    <br /> Run: `./client <HOSTNAME-OR-IP> <PORT> <ISN> <FILENAME>`
+        <br /> <HOSTNAME-OR-IP> hostname or IP address of the server to connect 
+       <br />  <port>           port number 
+       <br />  <isn>            initial sequence number 
+        <br /> <FILENAME>       name of file to transfer 
           
 
 
