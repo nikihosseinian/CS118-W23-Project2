@@ -1,15 +1,28 @@
 # CS118 Project 2
 
-This is the repo for Winter 2023 cs118 project 2.
+This is the repo for Winter 2023 cs118 project  2 completed by Nikki Hosseinian and Zoya Haq. 
 
-## Makefile
+This project aims to create a custom reliable data transfer protocol similar to TCP but utilizing UDP in C/C++ programming language. By implementing this protocol in server and client applications, the project intends to improve the understanding of how TCP works, particularly in handling packet losses. Our project involves developing functions such as large file transmission with pipelining and loss recovery using Go-Back-N (GBN). 
 
-This provides a couple make targets for things.
-By default (all target), it makes the `server` and `client` executables.
+## Installing and Running 
+1. Clone the Repository: `git clone https://github.com/nikihosseinian/CS118-W23-Project2.git`
+2. Change Directory: `cd CS118-W23-Project2`
+3. Open 1st Terminal: 
+    Compile: `gcc server.c -o server`
+    Run: `./server <port> <ISN>`
+        <port> port number 
+        <isn>  initial sequence number 
+          
+4. Open 2nd Terminal 
+    Compile: `gcc client.c -o client`
+    Run: `./client <HOSTNAME-OR-IP> <PORT> <ISN> <FILENAME>`
+        <HOSTNAME-OR-IP> hostname or IP address of the server to connect 
+        <port>           port number 
+        <isn>            initial sequence number 
+        <FILENAME>       name of file to transfer 
+          
 
-It provides a `clean` target, and `zip` target to create the submission file as well.
 
-You will need to modify the `Makefile` USERID to add your userid for the `.zip` turn-in at the top of the file.
 
 ## Academic Integrity Note
 
