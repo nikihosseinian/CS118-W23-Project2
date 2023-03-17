@@ -10,19 +10,13 @@ This project aims to create a custom reliable data transfer protocol similar to 
 3. Open 1st Terminal: 
 <br /> Compile: `gcc server.c -o server`
 <br /> Run: `./server <port> <ISN>`
-<br /> <port> port number 
-<br />  <isn>  initial sequence number 
+
           
 4. Open 2nd Terminal 
     <br /> Compile: `gcc client.c -o client`
     <br /> Run: `./client <HOSTNAME-OR-IP> <PORT> <ISN> <FILENAME>`
-        <br /> <HOSTNAME-OR-IP> hostname or IP address of the server to connect 
-       <br />  <port>           port number 
-       <br />  <isn>            initial sequence number 
-        <br /> <FILENAME>       name of file to transfer 
-          
 
-
+         
 
 ## Academic Integrity Note
 
