@@ -8,7 +8,7 @@ This project aims to create a custom reliable data transfer protocol similar to 
 1. Clone the Repository: `git clone https://github.com/nikihosseinian/CS118-W23-Project2.git`
 2. Change Directory: `cd CS118-W23-Project2`
 3. Open 1st Terminal: 
-    Compile: `gcc server.c -o server`
+<br /> Compile: `gcc server.c -o server`
     Run: `./server <port> <ISN>`
         <port> port number 
         <isn>  initial sequence number 
